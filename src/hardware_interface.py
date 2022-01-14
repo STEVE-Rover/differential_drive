@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import rospy
+from math import pi
 from copy import deepcopy
 from differential_drive.msg import VelocityTargets, Encoders
 from std_msgs.msg import Float32, Float64, Int32
@@ -11,7 +12,7 @@ class MotorVelocityController:
         self.upper_limit = 100
         self.lower_limit = -100
         self.rate = rospy.get_param("~rate", 50)
-        self.maximum_speed = rospy.get_param("~max_speed", 0.5)  # m/s
+        self.wheel_radius = rospy.get_param("~wheel_radius", 0.3) 
         self.encoder_min = rospy.get_param("~encoder_min", -32768)
         self.encoder_max = rospy.get_param("~encoder_max", 32768)
         self.encoder_low_wrap = (self.encoder_max - self.encoder_min) * 0.3 + self.encoder_min
@@ -60,9 +61,9 @@ class MotorVelocityController:
         self.handleWrapAround(3)
 
     def velocityTargetsCB(self, msg):
-        left_cmd = self.limitValue(-msg.left_wheel_vel_target / self.maximum_speed * self.upper_limit)
-        right_cmd = self.limitValue(msg.right_wheel_vel_target / self.maximum_speed * self.upper_limit)
-        self.publishMotorCmds(left_cmd, right_cmd)
+        left_angular_vel = -msg.left_wheel_vel_target / self.wheel_radius  # rad/s
+        right_angular_vel = msg.right_wheel_vel_target / self.wheel_radius  # rad/s
+        self.publishMotorCmds(left_angular_vel, right_angular_vel)
     
     def limitValue(self, value):
         if value > self.upper_limit:
@@ -84,7 +85,7 @@ class MotorVelocityController:
         if self.simulation:
             left_cmd = Float64()
             right_cmd = Float64()
-            left_cmd.data = left
+            left_cmd.data = -left
             right_cmd.data = right
             self.pub_lf_cmd.publish(left_cmd)
             self.pub_lm_cmd.publish(left_cmd)

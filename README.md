@@ -36,7 +36,7 @@ In other words, this node is responsible for making this package compatible with
 
 ### Parameters
 * ~rate (float, default: 50): Rate (in Hz) at which the loop executes
-* ~max_speed (float, default: 0.5): Maximum forward speed of the robot
+* ~wheel_radius (float, default 0.3): Radius of the wheels in meters
 * ~encoder_min (int, default: -32768): Minimum encoder value
 * ~encoder_max (int, default: 32768): Maximum encoder value
 * ~simulation (bool, default: false): If the robot is run in a simulation
