@@ -35,6 +35,7 @@ In other words, this node is responsible for making this package compatible with
 ### Parameters
 * ~rate (float, default: 50): Rate (in Hz) at which the loop executes
 * ~wheel_radius (float, default 0.3): Radius of the wheels in meters
+* ~ticks_per_revolution (int, default: 6045): Number of ticks per wheel revolution.
 * ~encoder_min (int, default: -32768): Minimum encoder value
 * ~encoder_max (int, default: 32768): Maximum encoder value
 * ~simulation (bool, default: false): If the robot is run in a simulation

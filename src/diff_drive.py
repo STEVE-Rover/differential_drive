@@ -20,8 +20,8 @@ class DifferentialDrive():
         self.publish_tf = rospy.get_param("~publish_tf", True)
 
         self.vel_target = VelocityTargets()
-        self.wheel_angles = WheelAngularPositions()  # Wheel encoders with wrap around
-        self.prev_wheel_angles = WheelAngularPositions()  # Previous wheel encoders with wrap around
+        self.wheel_angles = WheelAngularPositions()  # Wheel angular positions in radians
+        self.prev_wheel_angles = WheelAngularPositions()  # Previous wheel angular positions in radians
         self.prev_wheel_angles.angle_left = None 
         self.prev_wheel_angles.angle_right = None 
 
@@ -71,6 +71,7 @@ class DifferentialDrive():
         self.ticks_since_target = 0
 
     def wheelAnglesCB(self, msg):
+        self.wheel_angles = msg
         current_time = rospy.Time.now()
         if self.prev_time != None:
             elapsed_time = (current_time - self.prev_time).to_sec()
@@ -84,7 +85,7 @@ class DifferentialDrive():
     def updateOdometry(self, elapsed_time):
         if elapsed_time <= 0:
             return
-        if self.prev_wheel_angles.left_encoder == None or self.prev_wheel_angles.right_encoder == None:
+        if self.prev_wheel_angles.angle_left == None or self.prev_wheel_angles.angle_right == None:
             d_left = 0
             d_right = 0
         else:

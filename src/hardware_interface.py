@@ -13,7 +13,7 @@ class MotorVelocityController:
         self.lower_limit = -100
         self.rate = rospy.get_param("~rate", 50)
         self.wheel_radius = rospy.get_param("~wheel_radius", 0.3) 
-        self.ticks_per_revolution= float(rospy.get_param("~ticks_per_revolution", 50))
+        self.ticks_per_revolution= float(rospy.get_param("~ticks_per_revolution", 6045))
         self.encoder_min = rospy.get_param("~encoder_min", -32768)
         self.encoder_max = rospy.get_param("~encoder_max", 32768)
         self.encoder_low_wrap = (self.encoder_max - self.encoder_min) * 0.3 + self.encoder_min
@@ -48,7 +48,10 @@ class MotorVelocityController:
             self.pub_motor_cmd_right = rospy.Publisher("motor_cmd_right", Int32, queue_size=1)
 
     def jointStateCB(self, msg):
-        self.wheel_angles = msg.position[0:6]
+        self.wheel_angles[0] = msg.position[0]
+        self.wheel_angles[1] = msg.position[2]
+        self.wheel_angles[2] = msg.position[3]
+        self.wheel_angles[3] = msg.position[5]
     def lfwheelCB(self, msg):
         self.raw_enc[0] = msg.data
         self.handleWrapAround(0)
@@ -87,7 +90,7 @@ class MotorVelocityController:
         if self.simulation:
             left_cmd = Float64()
             right_cmd = Float64()
-            left_cmd.data = -left
+            left_cmd.data = left
             right_cmd.data = right
             self.pub_lf_cmd.publish(left_cmd)
             self.pub_lm_cmd.publish(left_cmd)
@@ -106,12 +109,12 @@ class MotorVelocityController:
     def publishWheelAngularPosition(self):
         wheel_angular_positions = WheelAngularPositions()
         if self.simulation:
-            values = self.wheel_angles
+            wheel_angular_positions.angle_left = (self.wheel_angles[0] + self.wheel_angles[1])/2
+            wheel_angular_positions.angle_right = (self.wheel_angles[2] + self.wheel_angles[3])/2
         else:
-            values = self.wrapped_enc
+            wheel_angular_positions.angle_left = ((self.wrapped_enc[0] + self.wrapped_enc[1])/2) / self.ticks_per_revolution * 2 * pi
+            wheel_angular_positions.angle_right = ((self.wrapped_enc[2] + self.wrapped_enc[3])/2) / self.ticks_per_revolution * 2 * pi
         # Average of the motors on the same side
-        wheel_angular_positions.angle_left = ((values[0] + values[1])/2) / self.ticks_per_revolution * 2 * pi
-        wheel_angular_positions.angle_right = ((values[2] + values[3])/2) / self.ticks_per_revolution * 2 * pi
         self.pub_wheel_angular_positions.publish(wheel_angular_positions)
 
 
