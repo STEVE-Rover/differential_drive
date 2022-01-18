@@ -71,27 +71,28 @@ class DifferentialDrive():
         self.ticks_since_target = 0
 
     def wheelAnglesCB(self, msg):
-        self.wheel_angles = msg
         current_time = rospy.Time.now()
         if self.prev_time != None:
             elapsed_time = (current_time - self.prev_time).to_sec()
             self.updateOdometry(elapsed_time)
         self.prev_time = current_time
 
-        self.pub_odom.publish(self.odometry)
+        self.pub_odom.publish(self.odometry, msg)
         if(self.publish_tf):
             self.publishTf()
 
-    def updateOdometry(self, elapsed_time):
+    def updateOdometry(self, elapsed_time, wheel_angles):
         if elapsed_time <= 0:
-            return
+            # TODO: for debug only, remove next line
+            elapsed_time = 0.02
+            # return
         if self.prev_wheel_angles.angle_left == None or self.prev_wheel_angles.angle_right == None:
             d_left = 0
             d_right = 0
         else:
-            d_left = (self.wheel_angles.angle_left - self.prev_wheel_angles.angle_left) * self.wheel_radius
-            d_right = (self.wheel_angles.angle_right - self.prev_wheel_angles.angle_right) * self.wheel_radius
-        self.prev_wheel_angles = deepcopy(self.wheel_angles)
+            d_left = (wheel_angles.angle_left - self.prev_wheel_angles.angle_left) * self.wheel_radius
+            d_right = (wheel_angles.angle_right - self.prev_wheel_angles.angle_right) * self.wheel_radius
+        self.prev_wheel_angles = deepcopy(wheel_angles)
 
         # Calculate distance and rotation traveled in the base frame in the x and y axis
         d_distance = (d_left + d_right) / 2
