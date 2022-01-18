@@ -13,13 +13,11 @@ This is the node that receives the encoder data to calculate the odometry and al
 
 ### Parameters
 * ~rate (float, default: 50): Rate (in Hz) at which the loop executes
-* ~base_width (float, default:0.2): Width between the left wheel to the right wheel
-* ~ticks_per_meter (int, default:50): Number of encoder ticks per meter
-* ~encoder_min (int, default:-32768): Minimum encoder value
-* ~encoder_max (int, default:32768): Maximum encoder value
-* ~base_frame_id (string, default:"base_link"): Name of base frame
-* ~odom_frame_id (string, default:"odom"): Name of odom frame
-* ~publish_tf (bool, default:true): Broadcast tf transform for base_link to odom
+* ~base_width (float, default: 0.2): Width between the left wheel to the right wheel
+* ~wheel_radius (float, default: 0.3): Radius of the wheels
+* ~base_frame_id (string, default: "base_link"): Name of base frame
+* ~odom_frame_id (string, default: "odom"): Name of odom frame
+* ~publish_tf (bool, default: true): Broadcast tf transform for base_link to odom
 
 ## hardware_interface
 The purpose of this node is to act as the middle man between the differential drive controller and the encoders and the motor controllers. This is where encoder wrap around should be handled and where the motor commands should be modified to be compatible with your hardware. <br>
