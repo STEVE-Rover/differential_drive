@@ -28,8 +28,8 @@ In other words, this node is responsible for making this package compatible with
 * TODO: individual wheel position topics. 
 ### Published topics
 * wheel_angles (differential_drive/WheelAngularPositions): Averaged wheel angular positions for the left and right sides of the robot.
-* motor_cmd_left (std_msgs/Int32): Motor value [0 - 100] for the left side of the robot
-* motor_cmd_right (std_msgs/Int32): Motor value [0 - 100] for the right side of the robot
+* motor_cmd_left (std_msgs/Int32): Left motor velocity commands in rad/s
+* motor_cmd_right (std_msgs/Int32): Right motor velocity commands in rad/s
 * /zeus/left_front_wheel_velocity_controller/command (std_msgs/Float64): Motor command when parameter `simulation` is set to true. There are also similarly named topics for the other five wheels.
 
 ### Parameters

@@ -68,6 +68,8 @@ class MotorVelocityController:
     def velocityTargetsCB(self, msg):
         left_angular_vel = -msg.left_wheel_vel_target / self.wheel_radius  # rad/s
         right_angular_vel = msg.right_wheel_vel_target / self.wheel_radius  # rad/s
+        left_angular_vel = left_angular_vel / 8 * 100  # FIXME: temporary until ros_talon accepts rad/s
+        right_angular_vel = right_angular_vel / 8 * 100
         self.publishMotorCmds(left_angular_vel, right_angular_vel)
     
     def limitValue(self, value):

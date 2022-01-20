@@ -74,10 +74,10 @@ class DifferentialDrive():
         current_time = rospy.Time.now()
         if self.prev_time != None:
             elapsed_time = (current_time - self.prev_time).to_sec()
-            self.updateOdometry(elapsed_time)
+            self.updateOdometry(elapsed_time, msg)
         self.prev_time = current_time
 
-        self.pub_odom.publish(self.odometry, msg)
+        self.pub_odom.publish(self.odometry)
         if(self.publish_tf):
             self.publishTf()
 
