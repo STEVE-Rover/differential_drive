@@ -11,7 +11,7 @@ class MotorVelocityController:
     def __init__(self):
         self.upper_limit = 100
         self.lower_limit = -100
-        self.rate = rospy.get_param("~rate", 50)
+        self.rate = rospy.get_param("~rate", 10)
         self.wheel_radius = rospy.get_param("~wheel_radius", 0.3) 
         self.ticks_per_revolution= float(rospy.get_param("~ticks_per_revolution", 6045))
         self.encoder_min = rospy.get_param("~encoder_min", -32768)
@@ -20,6 +20,7 @@ class MotorVelocityController:
         self.encoder_high_wrap = (self.encoder_max - self.encoder_min) * 0.7 + self.encoder_min
         self.simulation = rospy.get_param("~simulation", False)
 
+        self.stamps = [rospy.Time.now().to_sec()] * 4  # Latest time stamps of the encoders
         self.raw_enc = [0.0] * 4  # Wheel encoders with limits
         self.prev_raw_enc = [0.0] * 4  # Previous wheel encoders with limits
         self.enc_multipliers = [0.0] * 4  # Number of times the encoders have wrapped around
@@ -54,15 +55,19 @@ class MotorVelocityController:
         self.wheel_angles[3] = msg.position[5]
     def lfwheelCB(self, msg):
         self.raw_enc[0] = msg.data
+        self.stamps[0] = rospy.Time.now().to_sec()
         self.handleWrapAround(0)
     def lbwheelCB(self, msg):
         self.raw_enc[1] = msg.data
+        self.stamps[1] = rospy.Time.now().to_sec()
         self.handleWrapAround(1)
     def rfwheelCB(self, msg):
         self.raw_enc[2] = msg.data
+        self.stamps[2] = rospy.Time.now().to_sec()
         self.handleWrapAround(2)
     def rbwheelCB(self, msg):
         self.raw_enc[3] = msg.data
+        self.stamps[3] = rospy.Time.now().to_sec()
         self.handleWrapAround(3)
 
     def velocityTargetsCB(self, msg):
@@ -110,6 +115,8 @@ class MotorVelocityController:
 
     def publishWheelAngularPosition(self):
         wheel_angular_positions = WheelAngularPositions()
+        # Time stamp is the average time of the most recent time stamps for each encoder
+        wheel_angular_positions.header.stamp = rospy.Time.from_sec(sum(self.stamps)/len(self.stamps))
         if self.simulation:
             wheel_angular_positions.angle_left = (self.wheel_angles[0] + self.wheel_angles[1])/2
             wheel_angular_positions.angle_right = (self.wheel_angles[2] + self.wheel_angles[3])/2
@@ -121,7 +128,7 @@ class MotorVelocityController:
 
 
     def loop(self):
-        rate = rospy.Rate(50)
+        rate = rospy.Rate(self.rate)
         while not rospy.is_shutdown():
             self.publishWheelAngularPosition()
         rate.sleep()
