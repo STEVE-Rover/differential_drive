@@ -75,7 +75,6 @@ class DifferentialDrive():
         self.prev_time = current_time
 
         self.pub_odom.publish(self.odometry)
-        print(self.odometry)
         if(self.publish_tf):
             self.publishTf()
 
@@ -87,13 +86,14 @@ class DifferentialDrive():
         if self.prev_wheel_angles.angle_left == None or self.prev_wheel_angles.angle_right == None:
             d_left = 0
             d_right = 0
-        elif wheel_angles == self.prev_wheel_angles:
+        elif wheel_angles.angle_left == self.prev_wheel_angles.angle_left and \
+             wheel_angles.angle_right == self.prev_wheel_angles.angle_right:
             # No change so no need to update the odometry
             return
         else:
             d_left = (wheel_angles.angle_left - self.prev_wheel_angles.angle_left) * self.wheel_radius
             d_right = (wheel_angles.angle_right - self.prev_wheel_angles.angle_right) * self.wheel_radius
-            # print("angle_left=%f  prev_angle_left=%f" % (wheel_angles.angle_left, self.prev_wheel_angles.angle_left))
+            print("d_left=%f" % (d_left))
         self.prev_wheel_angles = deepcopy(wheel_angles)
 
         # Calculate distance and rotation traveled in the base frame in the x and y axis
