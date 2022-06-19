@@ -10,7 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
 add_message_files(
   FILES
   VelocityTargets.msg
-  Encoders.msg
+  WheelAngularPositions.msg
 )
 
 generate_messages(
